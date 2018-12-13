@@ -1,0 +1,168 @@
+package main;
+
+
+import org.rspeer.runetek.adapter.scene.Npc;
+import org.rspeer.runetek.adapter.scene.SceneObject;
+import org.rspeer.runetek.api.commons.Time;
+import org.rspeer.runetek.api.component.DepositBox;
+import org.rspeer.runetek.api.component.Dialog;
+import org.rspeer.runetek.api.component.WorldHopper;
+import org.rspeer.runetek.api.component.tab.Inventory;
+import org.rspeer.runetek.api.movement.Movement;
+import org.rspeer.runetek.api.movement.position.Area;
+import org.rspeer.runetek.api.movement.position.Position;
+import org.rspeer.runetek.api.scene.Npcs;
+import org.rspeer.runetek.api.scene.Players;
+import org.rspeer.runetek.api.scene.SceneObjects;
+import org.rspeer.script.Script;
+import org.rspeer.script.ScriptCategory;
+import org.rspeer.script.ScriptMeta;
+import org.rspeer.ui.Log;
+
+@ScriptMeta(name = "usethis one", desc = "Grabs bananas", developer = "Dark798", category = ScriptCategory.MONEY_MAKING)
+public class banana extends Script {
+
+    @Override
+    public void onStart() {
+        Log.info("Started script");    
+    }
+    
+	@Override
+    public int loop() {
+        Area maindocks = Area.rectangular(3018, 3193, 3062, 3246);
+        Area karamdocks = Area.rectangular(2945, 3161, 2962, 3139);
+        Area karamja = Area.rectangular(2883, 3129, 2963, 3188);
+        Area sarimboat = Area.rectangular(3028, 3234, 3039, 3208, 1);
+        Area karamboat = Area.rectangular(2946, 3146, 2973, 3135, 1);
+        Area area = Area.rectangular(2877, 3191, 2966, 3123);
+
+
+        Npc Officer = Npcs.getNearest("Customs officer");
+        SceneObject bananatree = SceneObjects.getNearest(x -> x.getName().contains("Banana Tree") && x.containsAction("Pick"));
+        
+
+        if (Inventory.contains("Coins")) {
+        Log.info(Movement.getDestination() != null ? Movement.getDestination() : "no destination");
+        if(Inventory.isFull()){
+        	if( karamdocks.contains(Players.getLocal()) && !Players.getLocal().isAnimating()){
+                if(Dialog.isOpen() || Dialog.isProcessing()){
+                    if (Dialog.isViewingChatOptions() && Dialog.process(0))            ;
+                        if (Dialog.canContinue() && Dialog.processContinue());
+                    }else{
+                        if(Officer != null){
+                            if(Officer.isPositionInteractable()){
+                                if(Officer.interact("Pay-fare")){
+                                    return 2000;
+                                }else{
+                                    Log.info("Failed to interact with Officer");
+                                }
+                            }else{
+                                Log.info("Officer is unreachable apparently");
+                            }
+                        }else{
+                            Log.info("Officer is a null lmfao");
+                        }
+                    }
+                }else if(area.contains(Players.getLocal())){
+                    Movement.walkTo(new Position(2951, 3146));
+                    Time.sleep(400);
+                    Log.info("Walk to 2951, 3146)");
+                }
+            if(sarimboat.contains(Players.getLocal())){
+                if(SceneObjects.getNearest("Gangplank") != null){
+                    if(SceneObjects.getNearest("Gangplank").interact("Cross")){
+                        Log.info("Interacted with plank");
+                        Time.sleep(400);
+                    }
+                }else{
+                    Log.info("Gang plank is null");
+                }
+            }
+            if(Players.getLocal().distance(new Position(3042, 3234)) < 40 && new Position(3042, 3234).isPositionWalkable()) {
+                if (DepositBox.isOpen()) {
+                    DepositBox.depositAll("Banana");
+                    Time.sleep(400);
+                } else {
+                    DepositBox.open();
+                    Log.info("Opening stuff");
+                    Time.sleep(400);
+                }
+            }
+
+        }
+        if(!Inventory.isFull()) {
+            if(karamboat.contains(Players.getLocal())) {
+                if(SceneObjects.getNearest("Gangplank") != null){
+                    if(SceneObjects.getNearest("Gangplank").interact("Cross")){
+                        Log.info("Interacted with plank");
+                        Time.sleep(400);
+                    }
+                }else{
+                    Log.info("Gang plank is null");
+                }
+            }
+            if (karamja.contains(Players.getLocal())) {
+                if (bananatree != null && bananatree.isPositionInteractable()) {
+                    if(bananatree.interact("Pick")) {
+                        Log.info("Interacted with banana tree");
+                        Time.sleep(400);
+                    }
+                } 
+                //else {
+                  //  Movement.walkTo(new Position(2917, 3162));
+                    //Log.info("Walk to 2917, 3162)");
+                    //Time.sleep(400);
+            		//}
+                else {WorldHopper.randomHopInF2p();
+            }
+            }
+            if(maindocks.contains(Players.getLocal())) {
+                if (Dialog.isOpen() || Dialog.isProcessing()) {
+                    if (Dialog.isViewingChatOptions()) {
+                        Dialog.process(0);
+                        Time.sleep(400);
+                    }
+                    if (Dialog.canContinue()) {
+                        Dialog.processContinue();
+                        Time.sleep(400);
+                    }
+                } else {
+                    if(Npcs.getNearest("Captain Tobias") != null) {
+                        if(Npcs.getNearest("Captain Tobias").interact("Pay-fare")) {
+                            Log.info("Interacted with captain tobias?");
+                            Time.sleep(400);
+                        }else {
+                            Log.info("Failed to interact with captain");
+                        }
+                    }else {
+                        Movement.walkTo(new Position(3028, 3213));
+                        Log.info("Captain is a null");
+                        Time.sleep(400);
+                    }
+                }
+            }else if(!area.contains(Players.getLocal()) && !Players.getLocal().isAnimating()){
+                    Movement.walkTo(new Position(3028, 3213));
+                Log.info("Walk to 3028, 3213");
+                Time.sleep(400);
+
+            }
+
+
+        }
+        }
+       
+
+
+    return random(200, 300);
+    }
+
+	private int random(int i, int j) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+    public void onStop() {
+        Log.info("Stopped script");
+    }
+}
